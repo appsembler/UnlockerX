@@ -22,6 +22,11 @@ Documentation
 
 The full documentation is at https://unlockerx.readthedocs.org.
 
+How to Install
+--------------
+
+TODO: Document.
+
 License
 -------
 

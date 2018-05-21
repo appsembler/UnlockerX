@@ -4,9 +4,12 @@ URLs for unlockerX.
 """
 from __future__ import absolute_import, unicode_literals
 
-from django.conf.urls import url
-from django.views.generic import TemplateView
+from ratelimitbackend import admin
 
-urlpatterns = [
-    url(r'', TemplateView.as_view(template_name="unlockerx/base.html")),
-]
+from django.conf.urls import include, url
+
+admin.autodiscover()
+
+urlpatterns = (
+    url(r'^admin/', include(admin.site.urls)),
+)
