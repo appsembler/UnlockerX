@@ -46,15 +46,19 @@ upgrade: ## update the requirements/*.txt files with the latest packages satisfy
 	pip-compile --upgrade -o requirements/test.txt requirements/base.in requirements/test.in
 	pip-compile --upgrade -o requirements/travis.txt requirements/travis.in
 	# Let tox control the Django version for tests
-	sed '/django==/d' requirements/test.txt > requirements/test.tmp
+	sed '/^django==/d' requirements/test.txt > requirements/test.tmp
 	mv requirements/test.tmp requirements/test.txt
 
 quality: ## check coding style with pycodestyle and pylint
 	tox -e quality
 
+isortify:
+	isort --recursive tests unlockerx manage.py setup.py test_settings.py
+
 requirements: ## install development environment requirements
 	pip install -qr requirements/dev.txt --exists-action w
 	pip-sync requirements/dev.txt requirements/private.* requirements/test.txt
+	pip install -e tests/edx_platform_mock  # Add mock modules for development from the edX-platform
 
 test: clean ## run tests in the current virtualenv
 	py.test

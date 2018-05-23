@@ -4,21 +4,19 @@ language: python
 
 python:
   - 2.7
-  - 3.6
 
-env:
-  - TOXENV=django18
-  - TOXENV=django111
-  - TOXENV=django20
+# TODO: Enable to support Hawthorn
+#env:
+#  - TOXENV=django18
+#  - TOXENV=django111
 
 matrix:
-  exclude:
-    - python: 2.7
-      env: TOXENV=django20
   include:
-    - python: 3.6
+    - python: 2.7
+      env: TOXENV=django18
+    - python: 2.7
       env: TOXENV=quality
-    - python: 3.6
+    - python: 2.7
       env: TOXENV=docs
 
 cache:

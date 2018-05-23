@@ -5,7 +5,7 @@ UnlockerX models to log the issues and allow removing limits.
 
 from __future__ import absolute_import, unicode_literals
 
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -26,7 +26,7 @@ class RateLimitedIP(TimeStampedModel):
     # This is informational, which aids search
     # In reality there could be many users for the same model, but I for now
     # need only the latest user.
-    latest_user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    latest_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         """
