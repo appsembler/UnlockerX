@@ -3,7 +3,7 @@ UnlockerX
 
 |travis-badge| |codecov-badge| |doc-badge|
 
-An app to manage (and remove) password and IP-based locks.
+An app to manage (and remove) both student-specific and IP-based locks in the Open edX platform.
 
 Overview
 --------
