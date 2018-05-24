@@ -10,10 +10,10 @@ Overview
 The edX Platform has two types of security rate limits to avoid
 stealing user passwords using brute-force attacks:
 
- - **IP-based rate limits:** Using `django-ratelimit-backend <https://github.com/brutasse/django-ratelimit-backend>`_
+- **IP-based rate limits:** Using `django-ratelimit-backend <https://github.com/brutasse/django-ratelimit-backend>`_
    to rate-limit subsequent incorrect requests and block the requester IP address for a period of time. IP-based locks
    are stored on the cache backend.
- - **Student-account locks:** This an *optional* edX platform feature. It works on the login screen and locks
+- **Student-account locks:** This an *optional* edX platform feature. It works on the login screen and locks
    user-accounts (regardless of the IP address) for a period of time. Student-locks are stored on the ``LoginFailure``
    model (in the database).
 
@@ -24,30 +24,30 @@ remove the locks and rate-limits, which is handy to support learners quickly.
 
 How to Install
 --------------
- - Install the pip package ``$ pip install -e git+git@github.com:appsembler/unlockerX.git#egg=unlockerx``
- - Add ``unlockerx`` to ``ADDL_INSTALLED_APPS`` in the ``lms.env.json`` file (or in ``server-vars.yml``).
- - Since the student-specific locks are disabled by default, enable it via
+- Install the pip package ``$ pip install -e git+git@github.com:appsembler/unlockerX.git#egg=unlockerx``
+- Add ``unlockerx`` to ``ADDL_INSTALLED_APPS`` in the ``lms.env.json`` file (or in ``server-vars.yml``).
+- Since the student-specific locks are disabled by default, enable it via
    ``FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = True``. More on `account lockout from edX <https://github.com/edx/edx-platform/wiki/Optional-Account-lockout-after-excessive-login-failures>`_.
- - Migrate and run the server.
+- Migrate and run the server.
 
 
 How to Use
 ----------
- - Go to ``/admin/unlockerx/``
- - Pick either one of ``RateLimitedIP`` or ``StudentAccountLock``
- - Select a limit (using the checkbox)
- - Click on the action dropdown and remove the limit.
+- Go to ``/admin/unlockerx/``
+- Pick either one of ``RateLimitedIP`` or ``StudentAccountLock``
+- Select a limit (using the checkbox)
+- Click on the action dropdown and remove the limit.
    |admin-screenshot|
- - Make the learner happy!
+- Make the learner happy!
 
 
 Monkey Patching
 ---------------
 This module monkey-patches the edX platform in two ways:
 
- - Changes the ``RateLimitMixin.requests`` to 100 to be a bit more permissive for mass-students logging in from
+- Changes the ``RateLimitMixin.requests`` to 100 to be a bit more permissive for mass-students logging in from
    a shared university IP.
- - Adds the UnlockerX rate-limit middleware to ``MIDDLEWARE_CLASSES`` to log blocked requests to the database.
+- Adds the UnlockerX rate-limit middleware to ``MIDDLEWARE_CLASSES`` to log blocked requests to the database.
 
 License
 -------
