@@ -26,7 +26,7 @@ class UnlockerXConfig(AppConfig):
 
     def ready(self):
         """
-        Monkeypatch the AUTHENTICATION_BACKENDS to add UnlockerX's.
+        Monkeypatch the MIDDLEWARE_CLASSES to add UnlockerX's and increase `RateLimitMixin` limit.
         """
         settings.MIDDLEWARE_CLASSES = update_middlewares(settings.MIDDLEWARE_CLASSES)
 

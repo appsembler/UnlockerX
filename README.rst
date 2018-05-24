@@ -1,31 +1,53 @@
-unlockerX
-=============================
+UnlockerX
+=========
 
 |travis-badge| |codecov-badge| |doc-badge| |license-badge|
 
-The ``README.rst`` file should start with a brief description of the repository,
-which sets it in the context of other repositories under the ``Appsembler``
-organization. It should make clear where this fits in to the overall Appsembler
-codebase.
-
 An app to manage (and remove) password and IP-based locks.
 
-Overview (please modify)
-------------------------
+Overview
+--------
+The edX Platform has two types of security rate limits to avoid
+stealing user passwords using brute-force attacks:
 
-The ``README.rst`` file should then provide an overview of the code in this
-repository, including the main components and useful entry points for starting
-to understand the code in more detail.
+ - **IP-based rate limits:** Using `django-ratelimit-backend <https://github.com/brutasse/django-ratelimit-backend>`_
+   to rate-limit subsequent incorrect requests and block the requester IP address for a period of time. IP-based locks
+   are stored on the cache backend.
+ - **Student-account locks:** This an *optional* edX platform feature. It works on the login screen and locks
+   user-accounts (regardless of the IP address) for a period of time. Student-locks are stored on the ``LoginFailure``
+   model (in the database).
 
-Documentation
--------------
+UnlockerX stores the IP-based rate limits in the database once a lock occurs in ``RateLimitedIP`` model. Additionally
+UnlockerX exposes both of ``LoginFailure`` and ``RateLimitedIP`` in an admin interface in which a superuser can
+remove the locks and rate-limits, which is handy to support learners quickly.
 
-The full documentation is at https://unlockerx.readthedocs.org.
 
 How to Install
 --------------
+ - Install the pip package ``$ pip install -e git+git@github.com:appsembler/unlockerX.git#egg=unlockerx``
+ - Add ``unlockerx`` to ``ADDL_INSTALLED_APPS`` in the ``lms.env.json`` file (or in ``server-vars.yml``).
+ - Since the student-specific locks are disabled by default, enable it via
+   ``FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = True``. More on `account lockout from edX <https://github.com/edx/edx-platform/wiki/Optional-Account-lockout-after-excessive-login-failures>`_.
+ - Migrate and run the server.
 
-TODO: Document.
+
+How to Use
+----------
+ - Go to ``/admin/unlockerx/``
+ - Pick either one of ``RateLimitedIP`` or ``StudentAccountLock``
+ - Select a limit (using the checkbox)
+ - Click on the action dropdown and remove the limit.
+   |admin-screenshot|
+ - Make the learner happy!
+
+
+Monkey Patching
+---------------
+This module monkey-patches the edX platform in two ways:
+
+ - Changes the ``RateLimitMixin.requests`` to 100 to be a bit more permissive for mass-students logging in from
+   a shared university IP.
+ - Adds the UnlockerX rate-limit middleware to ``MIDDLEWARE_CLASSES`` to log blocked requests to the database.
 
 License
 -------
@@ -35,34 +57,20 @@ otherwise noted.
 
 Please see ``LICENSE.txt`` for details.
 
+The original code was developed at `Edraak <https://github.com/Edraak/edraak-platform/pull/43>`_ and used to be
+licensed with AGPL 3.0. This repo has been re-licensed to MIT after Edraak's permission.
+
 How To Contribute
 -----------------
 
-Contributions are very welcome.
-
-Please read `How To Contribute <https://github.com/edx/edx-platform/blob/master/CONTRIBUTING.rst>`_ for details.
-
-Even though they were written with ``edx-platform`` in mind, the guidelines
-should be followed for Open edX code in general.
-
-PR description template should be automatically applied if you are sending PR from github interface; otherwise you
-can find it it at `PULL_REQUEST_TEMPLATE.md <https://github.com/appsembler/unlockerX/blob/master/.github/PULL_REQUEST_TEMPLATE.md>`_
-
-Issue report template should be automatically applied if you are sending it from github UI as well; otherwise you
-can find it at `ISSUE_TEMPLATE.md <https://github.com/appsembler/unlockerX/blob/master/.github/ISSUE_TEMPLATE.md>`_
+Contributions are very welcome. We're happy to accept pull requests.
+TravisCI will check your code for you, and we should have a reviewer
+in a couple of days.
 
 Reporting Security Issues
 -------------------------
 
 Please do not report security issues in public. Please email security@appsembler.org.
-
-Getting Help
-------------
-
-Have a question about this repository, or about Open edX in general?  Please
-refer to this `list of resources`_ if you need any assistance.
-
-.. _list of resources: https://open.edx.org/getting-help
 
 
 .. |travis-badge| image:: https://travis-ci.org/appsembler/unlockerX.svg?branch=master
@@ -80,3 +88,6 @@ refer to this `list of resources`_ if you need any assistance.
 .. |license-badge| image:: https://img.shields.io/github/license/appsembler/unlockerX.svg
     :target: https://github.com/appsembler/unlockerX/blob/master/LICENSE.txt
     :alt: License
+
+.. |admin-screenshot| image:: admin.png
+   :width: 550px
