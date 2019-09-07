@@ -19,16 +19,31 @@ from django.core.management import call_command
 from django.test import TestCase
 
 from student.tests.factories import UserFactory
-from unlockerx import helpers as unlockerx_helpers
 from unlockerx.admin import RateLimitedIPAdmin
+from unlockerx.helpers import helpers as unlockerx_helpers
+from unlockerx.helpers.settings_helpers import update_middlewares
 from unlockerx.middleware import UnlockerXRateLimitMiddleware
 from unlockerx.models import RateLimitedIP, StudentAccountLock
+from unlockerx.settings.common import plugin_settings
 
 EDX_MIDDLEWARE = 'ratelimitbackend.middleware.RateLimitMiddleware'
 UNLOCKERX_MIDDLEWARE = 'unlockerx.middleware.UnlockerXRateLimitMiddleware'
 
 
-class SettingsTest(TestCase):
+class BaseUnlockerXTestCase(TestCase):
+    """
+    Clear the cache.
+    """
+    def setUp(self):
+        super(BaseUnlockerXTestCase, self).setUp()
+        cache.clear()
+
+    def tearDown(self):
+        super(BaseUnlockerXTestCase, self).tearDown()
+        cache.clear()
+
+
+class SettingsTest(BaseUnlockerXTestCase):
     """
     Sanity checks for the environment settings.
     """
@@ -54,9 +69,17 @@ class SettingsTest(TestCase):
         self.assertEquals(RateLimitModelBackend.requests, 100,
                           msg='Increase the requests limit per 5 minutes, to avoid locking university students')
 
+    def test_the_edx_plugin_settings(self):
+        """
+        Basic tests to ensure `plugin_settings` is not throwing exceptions.
+        """
+        mock_settings = Mock(MIDDLEWARE_CLASSES=[EDX_MIDDLEWARE])
+        plugin_settings(mock_settings)
+        assert mock_settings.MIDDLEWARE_CLASSES == [UNLOCKERX_MIDDLEWARE]
 
-@patch('unlockerx.helpers.log_failed_attempt')
-class UnlockerXRateLimitMiddlewareTest(TestCase):
+
+@patch('unlockerx.helpers.helpers.log_failed_attempt')
+class UnlockerXRateLimitMiddlewareTest(BaseUnlockerXTestCase):
     """
     Tests for the database logs of `UnlockerXRateLimitMiddleware`.
     """
@@ -73,7 +96,7 @@ class UnlockerXRateLimitMiddlewareTest(TestCase):
 
 
 @ddt.ddt
-class AdminSetupTest(TestCase):
+class AdminSetupTest(BaseUnlockerXTestCase):
     """
     Tests for the admin setup and some logic tests.
     """
@@ -96,8 +119,6 @@ class AdminSetupTest(TestCase):
         """
         Try (and fail) logging into admin 100 times in a row on an non-existent user.
         """
-        cache.clear()
-
         assert not RateLimitedIP.objects.all(), 'There should be no registered locks!'
 
         for i in range(100):
@@ -120,10 +141,8 @@ class AdminSetupTest(TestCase):
             limit = RateLimitedIP.objects.all()[0]
             assert limit.lockout_count == expected_lock_count
 
-        cache.clear()
 
-
-class FakeRequestTest(TestCase):
+class FakeRequestTest(BaseUnlockerXTestCase):
     """
     Tests for the FakeRequest class helper.
     """
@@ -146,7 +165,7 @@ class FakeRequestTest(TestCase):
         self.assertEquals(request.POST['username'], 'robot')
 
 
-class RateLimitedIPAdminTest(TestCase):
+class RateLimitedIPAdminTest(BaseUnlockerXTestCase):
     """
     Testing the custom methods in the RateLimitedIPAdminTest
     """
@@ -206,7 +225,7 @@ class RateLimitedIPAdminTest(TestCase):
 
 
 @ddt.ddt
-class RateLimitedIPTest(TestCase):
+class RateLimitedIPTest(BaseUnlockerXTestCase):
     """
     Tests for the RateLimitedIP model.
     """
@@ -233,7 +252,7 @@ class RateLimitedIPTest(TestCase):
 
 
 @ddt.ddt
-class HelpersTest(TestCase):
+class HelpersTest(BaseUnlockerXTestCase):
     """
     Tests for unlockerx helpers.
     """
@@ -258,13 +277,13 @@ class HelpersTest(TestCase):
 
     def test_missing_middleware_on_update(self):
         with self.assertRaises(ValueError):
-            unlockerx_helpers.update_middlewares(('backend1', 'backend2'))
+            update_middlewares(('backend1', 'backend2'))
 
     def test_update_middlewaress_helper(self):
         """
         Ensures that the helper preserves the middleware location.
         """
-        updated_middlewares = unlockerx_helpers.update_middlewares((
+        updated_middlewares = update_middlewares((
             'dummy1',
             EDX_MIDDLEWARE,
             'dummy2',
@@ -278,7 +297,7 @@ class HelpersTest(TestCase):
 
     def test_call_update_middleware_twice(self):
         expected = [UNLOCKERX_MIDDLEWARE]
-        assert unlockerx_helpers.update_middlewares([UNLOCKERX_MIDDLEWARE]) == expected
+        assert update_middlewares([UNLOCKERX_MIDDLEWARE]) == expected
 
     @ddt.data(
         [EDX_MIDDLEWARE],  # List
@@ -286,10 +305,10 @@ class HelpersTest(TestCase):
     )
     def test_update_middleware(self, middlewares):
         expected = [UNLOCKERX_MIDDLEWARE]
-        self.assertEquals(unlockerx_helpers.update_middlewares(middlewares), expected)
+        self.assertEquals(update_middlewares(middlewares), expected)
 
 
-class StudentAccountLockTest(TestCase):
+class StudentAccountLockTest(BaseUnlockerXTestCase):
     """
     Basic checks to ensure that the model will have no migrations.
     """
@@ -310,7 +329,7 @@ class StudentAccountLockTest(TestCase):
         obj = StudentAccountLock(user=user)
         self.assertEquals(str(obj), 'user1 account lock')
 
-    @patch('unlockerx.helpers.log_failed_attempt')
+    @patch('unlockerx.helpers.helpers.log_failed_attempt')
     def test_rate_not_exceeded(self, db_log_failed_attempt):
         """
         Testing when the rate limit is not exceeded.
