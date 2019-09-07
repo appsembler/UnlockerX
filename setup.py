@@ -64,4 +64,12 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
     ],
+    entry_points={
+        "lms.djangoapp": [
+            "unlockerx = unlockerx.apps:UnlockerXConfig",
+        ],
+        "cms.djangoapp": [
+            "unlockerx = unlockerx.apps:UnlockerXConfig",
+        ],
+    },
 )

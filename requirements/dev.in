@@ -1,12 +1,13 @@
 # Additional requirements for development of this application
 
-diff-cover                     # Changeset diff test coverage
-django-ratelimit-backend==1.0  # RateLimited backend
-edx-i18n-tools                 # For i18n_tool dummy
-edx-lint                       # For updating pylintrc
-pip-tools                      # Requirements file management
-pytest-django                  # pytest extension for better Django support
-tox                            # virtualenv management for tests
-tox-battery                    # Makes tox aware of requirements file changes
-twine                          # Utility for PyPI package uploads
-wheel                          # For generation of wheels for PyPI
+diff-cover                       # Changeset diff test coverage
+django-ratelimit                 # Django ratelimit
+django-ratelimit-backend==1.1.1  # RateLimited backend
+edx-i18n-tools                   # For i18n_tool dummy
+edx-lint                         # For updating pylintrc
+pip-tools                        # Requirements file management
+pytest-django                    # pytest extension for better Django support
+tox                              # virtualenv management for tests
+tox-battery                      # Makes tox aware of requirements file changes
+twine                            # Utility for PyPI package uploads
+wheel                            # For generation of wheels for PyPI

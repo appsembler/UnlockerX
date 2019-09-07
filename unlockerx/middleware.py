@@ -8,7 +8,7 @@ from ratelimitbackend.middleware import RateLimitMiddleware
 
 from django.http import HttpResponseForbidden
 
-from unlockerx import helpers as unlockerx_helpers
+from unlockerx.helpers import helpers as unlockerx_helpers
 
 
 class UnlockerXRateLimitMiddleware(RateLimitMiddleware):

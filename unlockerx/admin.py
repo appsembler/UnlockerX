@@ -6,6 +6,7 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 
+import six
 from dateutil.relativedelta import relativedelta
 from ratelimitbackend.backends import RateLimitModelBackend
 
@@ -13,7 +14,7 @@ from django.contrib import admin
 from django.contrib.admin import DateFieldListFilter
 from django.core.cache import cache
 
-from unlockerx.helpers import FakeRequest, humanize_delta
+from unlockerx.helpers.helpers import FakeRequest, humanize_delta
 from unlockerx.models import RateLimitedIP, StudentAccountLock
 
 
@@ -33,7 +34,7 @@ class RateLimitedIPAdmin(admin.ModelAdmin):
     )
 
     list_display = (
-        '__unicode__',
+        'display_name',
         'latest_user',
         'lockout_count',
         'lockout_duration',
@@ -60,6 +61,12 @@ class RateLimitedIPAdmin(admin.ModelAdmin):
         """
         delta = relativedelta(obj.modified, obj.created)
         return humanize_delta(delta)
+
+    def display_name(self, obj):
+        """
+        Text representation of the RateLimitedIP object.
+        """
+        return six.text_type(obj)
 
     def unlock_time(self, obj):
         """

@@ -25,7 +25,6 @@ remove the locks and rate-limits, which is handy to support learners quickly.
 How to Install
 --------------
 - Install the pip package ``$ pip install -e git+git@github.com:appsembler/unlockerX.git#egg=unlockerx``
-- Add ``unlockerx`` to ``ADDL_INSTALLED_APPS`` in the ``lms.env.json`` file (or in ``server-vars.yml``).
 - Since the student-specific locks are disabled by default, enable it via
   ``FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = True``. More on `account lockout from edX <https://github.com/edx/edx-platform/wiki/Optional-Account-lockout-after-excessive-login-failures>`_.
 - Migrate and run the server.
@@ -47,7 +46,6 @@ This module monkey-patches the edX platform in two ways:
 
 - Changes the ``RateLimitMixin.requests`` to 100 to be a bit more permissive for mass-students logging in from
   a shared university IP.
-- Adds the UnlockerX rate-limit middleware to ``MIDDLEWARE_CLASSES`` to log blocked requests to the database.
 
 License
 -------

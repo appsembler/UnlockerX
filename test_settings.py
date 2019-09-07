@@ -9,6 +9,8 @@ from __future__ import absolute_import, unicode_literals
 
 from os.path import abspath, dirname, join
 
+from unlockerx.helpers.settings_helpers import update_middlewares
+
 DEBUG = True
 
 
@@ -19,7 +21,10 @@ def root(*args):
     return join(abspath(dirname(__file__)), *args)
 
 
-MIDDLEWARE_CLASSES = [
+# Calling `update_middlewares` to mock the behaviour of the Open edX plugins system.
+# Ref: https://github.com/edx/edx-platform/blob/ac4845d/openedx/core/djangoapps/plugins/README.rst
+# Keep in parity with `unlockerx.settings.common` to ensure proper testing environment.
+MIDDLEWARE_CLASSES = update_middlewares([
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 
@@ -32,7 +37,7 @@ MIDDLEWARE_CLASSES = [
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
-]
+])
 
 
 DATABASES = {

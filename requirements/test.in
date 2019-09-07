@@ -1,10 +1,11 @@
 # Requirements for test runs.
 
-ddt                            # Data driven tests
-django-model-utils             # Provides TimeStampedModel abstract base class
-django-ratelimit-backend==1.0  # RateLimited backend
-factory-boy==2.8.1             # Model factories for Django
-mock                           # Mocks for tests
-pytest-cov                     # pytest extension for code coverage statistics
-pytest-django                  # pytest extension for better Django support
-python-dateutil==2.4           # Date parser
+ddt                              # Data driven tests
+django-model-utils               # Provides TimeStampedModel abstract base class
+django-ratelimit                 # Django ratelimit
+django-ratelimit-backend==1.1.1  # RateLimited backend
+factory-boy==2.8.1               # Model factories for Django
+mock                             # Mocks for tests
+pytest-cov                       # pytest extension for code coverage statistics
+pytest-django                    # pytest extension for better Django support
+python-dateutil==2.4             # Date parser
